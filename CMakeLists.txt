@@ -85,10 +85,8 @@ if (BERKELEY_DB_FOUND)
   set(HAVE_BDB 1)
 endif()
 
-find_package(GnuTLS REQUIRED)
-if (GNUTLS_FOUND)
-  set(HAVE_GNUTLS 1)
-endif()
+find_package(GnuTLS)
+set(HAVE_GNUTLS 1)
 
 # (De)Compressor libraries
 find_package(ZLIB REQUIRED)
