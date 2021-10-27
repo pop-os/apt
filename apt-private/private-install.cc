@@ -1,6 +1,8 @@
 // Include Files							/*{{{*/
 #include <config.h>
 
+#include <sys/stat.h>
+
 #include <apt-pkg/acquire-item.h>
 #include <apt-pkg/acquire.h>
 #include <apt-pkg/algorithms.h>
@@ -278,20 +280,29 @@ bool InstallPackages(CacheFile &Cache, bool ShwKept, bool Ask, bool Safety, std:
    if (Essential == true && Safety == true && _config->FindB("APT::Get::allow-remove-essential", false) == false)
    {
       if (_config->FindB("APT::Get::Trivial-Only",false) == true)
-	 return _error->Error(_("Trivial Only specified but this is not a trivial operation."));
+         return _error->Error(_("Trivial Only specified but this is not a trivial operation."));
 
-      // TRANSLATOR: This string needs to be typed by the user as a confirmation, so be
-      //             careful with hard to type or special characters (like non-breaking spaces)
-      const char *Prompt = _("Yes, do as I say!");
-      std::string question;
-      strprintf(question,
-	       _("You are about to do something potentially harmful.\n"
-		 "To continue type in the phrase '%s'\n"
-		 " ?] "),Prompt);
-      if (AnalPrompt(question, Prompt) == false)
-      {
-	 c2out << _("Abort.") << std::endl;
-	 exit(1);
+      struct stat buffer;
+      if (stat("/etc/apt/break-my-system", &buffer) == 0) {
+         // If `/etc/apt/break-my-system` is present, present the former prompt.
+
+         // TRANSLATOR: This string needs to be typed by the user as a confirmation, so be
+         //             careful with hard to type or special characters (like non-breaking spaces)
+         const char *Prompt = _("Yes, do as I say!");
+         std::string question;
+         strprintf(question,
+            _("You are about to do something potentially harmful.\n"
+               "To continue type in the phrase '%s'\n"
+               " ?] "), Prompt);
+         if (AnalPrompt(question, Prompt) == false) {
+            c2out << _("Abort.") << std::endl;
+            exit(1);
+         }
+      } else {
+         // Disallow breaking the system. Do not prompt the user.
+         c2out << _("This operation is not permitted because it will break the system.") << std::endl;
+         c2out << _("Abort.") << std::endl;
+         exit(1);
       }
    }
    else
