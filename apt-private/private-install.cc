@@ -312,10 +312,10 @@ bool InstallPackages(CacheFile &Cache, APT::PackageVector &HeldBackPackages, boo
 
          // TRANSLATOR: This string needs to be typed by the user as a confirmation, so be
          //             careful with hard to type or special characters (like non-breaking spaces)
-         const char *Prompt = _("Yes, do as I say!");
+         const char *Prompt = _("Do as I say! Break my system!");
          std::string question;
          strprintf(question,
-            _("You are about to do something potentially harmful.\n"
+            _("You are about to do something that will break your system.\n"
                "To continue type in the phrase '%s'\n"
                " ?] "), Prompt);
          if (AnalPrompt(question, Prompt) == false) {
